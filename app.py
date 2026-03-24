@@ -6,7 +6,7 @@ import time
 import re
 
 # ==========================================
-# TIER 1: SMART HEURISTIC DEFENSE (FLEXIBLE REGEX)
+# TIER 1: SMART HEURISTIC DEFENSE
 # ==========================================
 MALICIOUS_PATTERNS = [
     # Prompt Injection & Jailbreak 
@@ -17,7 +17,7 @@ MALICIOUS_PATTERNS = [
     r"do\s+anything\s+now",
     r"bypass.*?(restrictions|filters|safety|firewall|authentication|auth)",
     
-    # Payload Generation (Morphological Evasion Korumalı: keylog(ger|ging), hack(ing) vb.)
+    # Payload Generation
     r"(write|create|build|code|develop|generate|give|show|provide|produce|output|craft|design).*?(keylog(ger|ging)?|virus|ransomware|malware|trojan|rootkit|exploit|hack(ing)?\s+(code|script)|(code|script)\s+to\s+hack(ing)?|payload|shellcode)",
     r"(write|create|build|code|develop|generate|give|show|provide|produce|output|craft|design).*?(reverse\s+shell|backdoor|botnet)",
     r"(perform|execute|inject|write|create|give|show|provide|conduct).*?(sql\s+injection|sqli)",
@@ -37,7 +37,7 @@ MALICIOUS_PATTERNS = [
     r"(how\s+to|guide|tutorial|steps).*?(hack(ing)?|bypass(ing)?|exploit(ing)?|keylog(ger|ging)?|ddos(ing)?|phish(ing)?|breach(ing)?)",
     r"(how\s+to|guide|tutorial|steps).*?(create|write|build|code|give|show|provide).*?(keylog(ger|ging)?|virus|malware|ransomware|trojan|exploit|payload)",
 
-    # Reverse Order Attacks (Master Yoda Attacks)
+    # Reverse Order Attacks
     r"(keylog(ger|ging)?|virus|ransomware|malware|trojan|rootkit|exploit|hack(ing)?\s+(code|script)|(code|script)\s+to\s+hack(ing)?|payload|shellcode).*?(write|create|build|code|develop|generate|give|show|provide|produce|output|craft|design)",
     r"(reverse\s+shell|backdoor|botnet).*?(write|create|build|code|develop|generate|give|show|provide|produce|output|craft|design)",
     r"(sql\s+injection|sqli|cross-site\s+scripting|xss).*?(perform|execute|inject|write|create|give|show|provide|conduct)"
@@ -138,7 +138,6 @@ if submit_btn and user_prompt:
                 st.progress(100)
                 st.write("100.00% Malicious (Action-Based Rule)")
             
-            # Sonucu SOL kolondaki (Chat) alana yazdırıyoruz ki ekrana sığsın
             with chat_result_box.container():
                 st.error("🚨 **SECURITY VIOLATION (TIER 1)** 🚨")
                 st.warning("Your request contains direct malicious actions or rule violations. It has been blocked by the heuristic engine.")
@@ -174,7 +173,6 @@ if submit_btn and user_prompt:
                 else:
                     st.caption(f"*(Strict Block Threshold: {MALICIOUS_THRESHOLD}%)*")
 
-            # Sonucu SOL kolondaki (Chat) alana yazdırıyoruz
             with chat_result_box.container():
                 if is_malicious_tier2:
                     st.error("🚨 **SECURITY VIOLATION (TIER 2)** 🚨")
