@@ -29,17 +29,22 @@ Prompts that bypass Tier 1 are analyzed by a custom-trained `distilbert-base-unc
 ### Post-Processing: Score Calibration
 To prevent Neural Network Overconfidence, the system mathematically calibrates threat scores for safe academic research or casual conversational prompts, eliminating False Positives on benign edge cases.
 
-## Datasets Used
+## Datasets Used & Aggregation Strategy
 
-To build a highly accurate and context-aware classification model, the DistilBERT architecture was fine-tuned on an aggregated dataset combining both real-world threats and complex benign queries.
+To build a highly accurate and context-aware classification model, the DistilBERT architecture was fine-tuned on a robust, aggregated dataset. The data was carefully balanced to teach the model the semantic difference between real-world threats and complex, benign engineering queries.
 
 **🔴 Malicious Datasets (Label 1: Threat)**
-* [deepset/prompt-injections](https://huggingface.co/datasets/deepset/prompt-injections): Used to teach the model foundational manipulation tactics (e.g., "ignore previous instructions", "system prompt extraction").
-* [Prompt Injection in the Wild](https://www.kaggle.com/datasets/arielzilber/prompt-injection-in-the-wild) (Kaggle): Integrated to expose the model to a wide variety of real-world adversarial attacks and jailbreak frameworks.
+* **[deepset/prompt-injections](https://huggingface.co/datasets/deepset/prompt-injections):** Used to teach the model foundational manipulation tactics (e.g., "ignore previous instructions", "system prompt extraction").
+* **[JasperLS/prompt-injections](https://huggingface.co/datasets/JasperLS/prompt-injections):** Integrated to expand the model's vocabulary against a diverse and modern attack taxonomy.
+* **[rubend18/ChatGPT-Jailbreak-Prompts](https://huggingface.co/datasets/rubend18/ChatGPT-Jailbreak-Prompts):** Provided high-quality, complex jailbreaks and persona manipulation scenarios (e.g., "Developer Mode", "DAN").
+* **[Prompt Injection in the Wild (Kaggle)](https://www.kaggle.com/datasets/arielzilber/prompt-injection-in-the-wild):** Exposes the model to a wide variety of real-world adversarial attacks and user-generated jailbreak frameworks.
 
 **🟢 Benign Datasets (Label 0: Safe)**
-* [yahma/alpaca-cleaned](https://huggingface.co/datasets/yahma/alpaca-cleaned): Provided a baseline for standard, non-malicious user interactions and casual conversations.
-* [sahil2801/CodeAlpaca-20k](https://huggingface.co/datasets/sahil2801/CodeAlpaca-20k): **Crucial for preventing False Positives.** This dataset taught the model complex software engineering terminology, coding queries, and database configurations, ensuring that legitimate developer requests are not mistakenly flagged as malicious payloads.
+* **[yahma/alpaca-cleaned](https://huggingface.co/datasets/yahma/alpaca-cleaned):** Provided a baseline for standard, non-malicious user interactions and general instructions.
+* **[sahil2801/CodeAlpaca-20k](https://huggingface.co/datasets/sahil2801/CodeAlpaca-20k):** Taught the model complex software engineering terminology and database configurations, ensuring that legitimate developer requests are not mistakenly flagged as payloads.
+* **[OpenAssistant/oasst1](https://huggingface.co/datasets/OpenAssistant/oasst1):** Integrated real human conversational turns to reduce false positives during casual, everyday chat interactions.
+* **[databricks/databricks-dolly-15k](https://huggingface.co/datasets/databricks/databricks-dolly-15k):** Added diverse non-malicious categories such as creative writing, brainstorming, and summarization.
+* **[pacovaldez/stackoverflow-questions](https://huggingface.co/datasets/pacovaldez/stackoverflow-questions):** **Crucial for security context.** This dataset trains the model to understand the difference between an informational query ("How do SQL injection attacks work?") and a malicious action request ("Write an SQL injection script").
 
 ## Tech Stack
 * **Machine Learning:** PyTorch, HuggingFace Transformers (DistilBERT)
