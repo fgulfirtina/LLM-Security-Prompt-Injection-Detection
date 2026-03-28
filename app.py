@@ -46,6 +46,11 @@ _EXFOBJ   = r"(?:system\s+prompt(?:s)?|conversation\s+history|context\s+window|i
 _DB_QUERY   = r"(?:database\s+)?(?:sql\s+)?quer(?:y|ies)"
 _RECON_OBJ  = r"(?:all\s+)?(?:open|active|vulnerable)\s+port(?:s)?"
 
+# Captures variations of "how to", "what should I do to", "steps to", etc.
+_TUTORIAL_REQ = r"(?:how\s+to|what\s+.*?\s+do\s+to|steps\s+to|guide\s+(?:on|to|for)|tell\s+me\s+how|ways?\s+to|instructions?\s+(?:on|for))"
+    
+_HACKING_VERBS = r"(?:hack(?:s|ed|ing|er|ers)?|crack(?:s|ed|ing)?|infiltrat(?:e|es|ed|ing)|compromis(?:e|es|ed|ing)|hijack(?:s|ed|ing)?|ddos)"
+
 
 TIER1_PATTERNS = [
     # Payload generation: verb + malware/exploit object
@@ -54,9 +59,11 @@ TIER1_PATTERNS = [
 
     # Attack execution: verb + attack type
     rf"{_PERFORM}.*?{_ATTACK}",
+    rf"{_ATTACK}.*?{_PERFORM}",
 
     # Phishing / social engineering generation
     rf"{_GENERATE}.*?{_PHISH}",
+    rf"{_PHISH}.*?{_GENERATE}",
 
     # Safety bypass: explicit bypass verb + safety target
     rf"{_BYPASS}.*?(?:safety|restriction(?:s)?|filter(?:s)?|guardrail(?:s)?|polic(?:y|ies)|rule(?:s)?|content\s+polic(?:y|ies)|moderation)",
@@ -75,6 +82,7 @@ TIER1_PATTERNS = [
 
     # Data exfiltration: send model internals somewhere
     rf"{_EXFIL}.*?{_EXFOBJ}",
+    rf"{_EXFOBJ}.*?{_EXFIL}",
     rf"{_EXFIL}.*?(?:your\s+(?:output|response|reply))\s+to\s+(?:http|www\.|this\s+url)",
 
     # ==========================================
@@ -89,9 +97,16 @@ TIER1_PATTERNS = [
 
     # "Manipulate database query" (stops subtle SQLi logic requests)
     rf"{_MANIPULATE}.*?{_DB_QUERY}",
+    rf"{_DB_QUERY}.*?{_MANIPULATE}",
 
     # "Discover open ports" (stops network reconnaissance scripts like our sci-fi villain)
-    rf"{_RECON_VERB}.*?{_RECON_OBJ}"
+    rf"{_RECON_VERB}.*?{_RECON_OBJ}",
+    rf"{_RECON_OBJ}.*?{_RECON_VERB}",
+
+    # Blocks instructional requests for attacks (e.g., "what i should do to hack")
+    # The (?!.*?(?:prevent|stop|secure|protect|defend|patch)) ensures we DO NOT block defensive questions
+    rf"{_TUTORIAL_REQ}\s+(?!.*?(?:prevent|stop|secure|protect|defend|patch|fix)).*?{_HACKING_VERBS}\b",
+    rf"{_HACKING_VERBS}\s+(?!.*?(?:prevent|stop|secure|protect|defend|patch|fix)).*?{_TUTORIAL_REQ}\b",
 ]
 
 _COMPILED = [re.compile(p, re.IGNORECASE | re.DOTALL) for p in TIER1_PATTERNS]
